@@ -37,6 +37,11 @@ runTests = hspec $
                                 (last x) ++ [0x80] ++ repeat 0
             it "checks that unpad is pad's inverse" $ do
                 property checkPadAndUnpadAreInverse
+            it "checks that invalid padding will not unpad" $ do
+                unpad [[0,0,0,0]] `shouldBe` Nothing
+                unpad [[1,2,0x80,3,4]] `shouldBe` Nothing
+                unpad [[1,2,0,0,0]] `shouldBe` Nothing
+                unpad [[1,2,0x80,0,0]] `shouldNotBe` Nothing
 
 checkPadAndUnpadAreInverse :: [Block] -> Bool
 checkPadAndUnpadAreInverse [] = (unpad . pad) [] == Just []
