@@ -35,3 +35,11 @@ runTests = hspec $
                          else
                             and . zipWith (==) (last p) $ 
                                 (last x) ++ [0x80] ++ repeat 0
+            it "checks that unpad is pad's inverse" $ do
+                property checkPadAndUnpadAreInverse
+
+checkPadAndUnpadAreInverse :: [Block] -> Bool
+checkPadAndUnpadAreInverse [] = (unpad . pad) [] == Just []
+checkPadAndUnpadAreInverse bs
+    | last bs /= [] = (unpad . pad) bs == Just bs
+    | otherwise = True -- Discard the tests that have [] as the final list item
