@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import SBox
 
 main :: IO ()
-main = someFunc
+main = return ()
