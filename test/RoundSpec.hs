@@ -24,9 +24,16 @@ roundOutput1 = [0xF2, 0x65, 0xE8, 0xD5, 0x1F, 0xD2, 0x39, 0x7B,
 runTests :: IO ()
 runTests = hspec $ do
     describe "Round Module" $ do
-        describe "roundEncrypt" $ do
-            it "ensures that roundEncrypt produces correct output" $ do
+        describe "roundEncrypt" $
+            it "ensures that roundEncrypt produces correct output" $
                 roundEncrypt subKey1 initialKeyAddOutput1 `shouldBe` roundOutput1
-        describe "roundDecrypt" $ do
-            it "ensures that roundDecrypt produces correct output" $ do
-                pendingWith "need to write and test internal library first"
+        describe "roundDecrypt" $
+            it "ensures that roundDecrypt produces correct output" $
+                roundDecrypt subKey1 roundOutput1 `shouldBe` initialKeyAddOutput1
+        describe "check inverse holds" $
+            it "checks that round encryption and decryption are inverses of each other" $ do
+                encryptDecrypt initialKeyAddOutput1 `shouldBe` initialKeyAddOutput1
+                decryptEncrypt initialKeyAddOutput1 `shouldBe` initialKeyAddOutput1
+    where
+        encryptDecrypt = roundDecrypt subKey1 . roundEncrypt subKey1
+        decryptEncrypt = roundEncrypt subKey1 . roundDecrypt subKey1

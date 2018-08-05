@@ -17,8 +17,8 @@ key :: Key
 key = [0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6,
     0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C]
 
-initialKeyAddOutput1 :: Block
-initialKeyAddOutput1 = [0x40, 0xBF, 0xAB, 0xF4, 0x06, 0xEE, 0x4D, 0x30,
+initialKeyAddOutput :: Block
+initialKeyAddOutput = [0x40, 0xBF, 0xAB, 0xF4, 0x06, 0xEE, 0x4D, 0x30,
     0x42, 0xCA, 0x6B, 0x99, 0x7A, 0x5C, 0x58, 0x16]
 
 subKey1 :: Key
@@ -45,17 +45,28 @@ runTests :: IO ()
 runTests = hspec $ do
     describe "Round.Internal Module" $ do
         describe "InitialKeyAdd" $ do
-            it "ensures that the initial keyAdd functions correctly" $ do
-                keyAdd key block1 `shouldBe` initialKeyAddOutput1
-        describe "R1ByteSub" $ do
-            it "ensures that the byteSub SBox layer functions correctly" $ do
-                byteSub initialKeyAddOutput1 `shouldBe` byteSubOutput1
-        describe "R1ShiftRows" $ do
-            it "ensures that the shiftRows layer functions correctly" $ do
+            it "ensures that the initial keyAdd functions correctly" $
+                keyAdd key block1 `shouldBe` initialKeyAddOutput
+            it "ensures that the initial keyAdd functions correctly" $
+                keyAdd key initialKeyAddOutput `shouldBe` block1
+        describe "ByteSub" $ do
+            it "ensures that the byteSub SBox layer functions correctly" $
+                byteSub initialKeyAddOutput `shouldBe` byteSubOutput1
+            it "ensures that the inverse byteSub SBox layer functions correctly" $
+                byteSubInv byteSubOutput1 `shouldBe` initialKeyAddOutput
+        describe "ShiftRows" $ do
+            it "ensures that the shiftRows layer functions correctly" $
                 shiftRows byteSubOutput1 `shouldBe` shiftRowsOutput1
-        describe "R1MixColumn" $ do
-            it "ensures that the mixColumns layer functions correctly" $ do
+            it "ensures that the inverse shiftRows layer functions correctly" $
+                shiftRowsInv shiftRowsOutput1 `shouldBe` byteSubOutput1
+        describe "MixColumn" $ do
+            it "ensures that the mixColumns layer functions correctly" $
                 mixColumns shiftRowsOutput1 `shouldBe` mixColumnsOutput1
-        describe "R1KeyAdd" $ do
-            it "ensures that the keyAdd layer functions correctly" $ do
+            it "ensures that the inverse mixColumns layer functions correctly" $
+                mixColumnsInv mixColumnsOutput1 `shouldBe` shiftRowsOutput1
+        describe "KeyAdd" $ do
+            it "ensures that the keyAdd layer functions correctly" $
                 keyAdd subKey1 mixColumnsOutput1 `shouldBe` keyAddOutput1
+            it "ensures that the inverse keyAdd layer functions correctly" $
+                keyAdd subKey1 keyAddOutput1 `shouldBe` mixColumnsOutput1
+

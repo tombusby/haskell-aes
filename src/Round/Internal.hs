@@ -24,25 +24,35 @@ byteSub :: Block -> Block
 byteSub = map sBox
 
 byteSubInv :: Block -> Block
-byteSubInv = undefined
+byteSubInv = map sBoxInv
 
 shiftRows :: Block -> Block
-shiftRows = concat . transpose . rotate . transpose . chunksOf 4
-    where
-        rotate = zipWith rotateRow [0, 1, 2, 3]
-        rotateRow n xs = take (length xs) (drop n (cycle xs))
+shiftRows = shiftRowsCommon [0, 1, 2, 3]
 
 shiftRowsInv :: Block -> Block
-shiftRowsInv = undefined
+shiftRowsInv = shiftRowsCommon [0, 3, 2, 1]
+
+shiftRowsCommon :: [Int] -> Block -> Block
+shiftRowsCommon shiftVals = concat . transpose . rotate . transpose . chunksOf 4
+    where
+        rotate = zipWith rotateRow shiftVals
+        rotateRow n xs = take (length xs) (drop n (cycle xs))
 
 mixColumns :: Block -> Block
-mixColumns = map fromIntegral . concat . matrixMults . chunksOf 4
+mixColumns = mixColumnsCommon matrixConsts
     where
-        matrixMults b = [zipWith doMults (repeat r) matrixConsts | r <- b]
-        doMults l = foldr addF2m 0 . zipWith multWord l
-        multWord = mulF2m aesPolynomial . fromIntegral
         matrixConsts = [[2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]]
-        aesPolynomial = 0x11B
 
 mixColumnsInv :: Block -> Block
-mixColumnsInv = undefined
+mixColumnsInv = mixColumnsCommon matrixConsts
+    where
+        matrixConsts = [[0x0E, 0x0B, 0x0D, 0x09], [0x09, 0x0E, 0x0B, 0x0D],
+            [0x0D, 0x09, 0x0E, 0x0B], [0x0B, 0x0D, 0x09, 0x0E]]
+
+mixColumnsCommon :: [[Integer]] -> Block -> Block
+mixColumnsCommon consts = map fromIntegral . concat . matrixMults . chunksOf 4
+    where
+        matrixMults b = [zipWith doMults (repeat r) consts | r <- b]
+        doMults l = foldr addF2m 0 . zipWith multWord l
+        multWord = mulF2m aesPolynomial . fromIntegral
+        aesPolynomial = 0x11B
