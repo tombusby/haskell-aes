@@ -14,7 +14,7 @@ import Data.List (transpose)
 import Data.List.Split (chunksOf)
 import Crypto.Number.F2m (addF2m, mulF2m)
 
-import Globals (Key, Block, chunkSize)
+import Globals (Key, Block, chunkSize, aesPolynomial)
 import SBox (sBox, sBoxInv)
 
 keyAdd :: Key -> Block -> Block
@@ -55,4 +55,3 @@ mcCommon consts = map fromIntegral . concat . matrixMults . chunksOf chunkSize
         matrixMults b = [zipWith doMults (repeat r) consts | r <- b]
         doMults l = foldr addF2m 0 . zipWith multWord l
         multWord = mulF2m aesPolynomial . fromIntegral
-        aesPolynomial = 0x11B
