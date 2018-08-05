@@ -3,6 +3,7 @@ module Round.Internal where
 import Data.Bits
 import Data.List
 import Data.List.Split
+import Crypto.Number.F2m
 
 import Globals (Key, Block)
 import SBox
