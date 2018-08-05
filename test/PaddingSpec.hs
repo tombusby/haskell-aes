@@ -35,6 +35,7 @@ runTests = hspec $
                          else
                             and . zipWith (==) (last p) $ 
                                 (last x) ++ [0x80] ++ repeat 0
+        describe "unpad" $ do
             it "checks that unpad is pad's inverse" $ do
                 property checkPadAndUnpadAreInverse
             it "checks that invalid padding will not unpad" $ do
