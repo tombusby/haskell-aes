@@ -3,6 +3,7 @@ module Round
     ) where
 
 import Globals (Key, Block, blockSize, numRounds)
+import Round.Internal
 
 roundEncrypt :: Key -> Block -> Block
 roundEncrypt = undefined
