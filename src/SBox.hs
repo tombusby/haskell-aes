@@ -3,7 +3,7 @@ module SBox
     , sBoxInv
     ) where
 
-import Data.Word
+import Data.Word (Word8)
 
 sBox :: Word8 -> Word8
 sBox x = [0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5,

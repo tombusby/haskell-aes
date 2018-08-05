@@ -1,12 +1,16 @@
 module Round.Internal where
 
-import Data.Bits
-import Data.List
-import Data.List.Split
-import Crypto.Number.F2m
+import Data.Word (Word8)
+import Data.Bits (xor)
+import Data.List (transpose)
+import Data.List.Split (chunksOf)
+import Crypto.Number.F2m (BinaryPolynomial, addF2m, mulF2m)
 
 import Globals (Key, Block)
 import SBox
+
+aes_polynomial :: BinaryPolynomial
+aes_polynomial = 0x11B
 
 byteSub :: Block -> Block
 byteSub = map SBox.sBox
