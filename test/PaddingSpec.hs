@@ -45,6 +45,8 @@ runTests = hspec $
 
 checkPadAndUnpadAreInverse :: [Block] -> Bool
 checkPadAndUnpadAreInverse [] = (unpad . pad) [] == Just []
-checkPadAndUnpadAreInverse bs
-    | last bs /= [] = (unpad . pad) bs == Just bs
-    | otherwise = True -- Discard the tests that have [] as the final list item
+checkPadAndUnpadAreInverse bs = (unpad . pad) bs' == Just bs'
+    where
+         -- Prevents issues caused when `last bs == []`
+         -- (This is state that cannot occur naturally)
+        bs' = filter (/=[]) bs
