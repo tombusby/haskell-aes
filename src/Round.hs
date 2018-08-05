@@ -3,7 +3,7 @@ module Round
       roundDecrypt,
     ) where
 
-import Globals (Key, Block, blockSize, numRounds)
+import Globals (Key, Block)
 import Round.Internal (keyAdd, byteSub, shiftRows, mixColumns,
         byteSubInv, shiftRowsInv, mixColumnsInv)
 

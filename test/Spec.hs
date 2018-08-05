@@ -2,6 +2,7 @@ import SBoxSpec (runTests)
 import PaddingSpec (runTests)
 import RoundInternalSpec (runTests)
 import RoundSpec (runTests)
+import SubKeyGenSpec (runTests)
 
 main :: IO ()
 main = do
@@ -9,3 +10,4 @@ main = do
     PaddingSpec.runTests
     RoundInternalSpec.runTests
     RoundSpec.runTests
+    SubKeyGenSpec.runTests

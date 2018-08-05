@@ -10,3 +10,6 @@ blockSize = 16
 
 numRounds :: Num a => a
 numRounds = 10
+
+chunkSize :: Num a => a
+chunkSize = 4
