@@ -21,6 +21,10 @@ initialKeyAddOutput1 :: Block
 initialKeyAddOutput1 = [0x40, 0xBF, 0xAB, 0xF4, 0x06, 0xEE, 0x4D, 0x30,
     0x42, 0xCA, 0x6B, 0x99, 0x7A, 0x5C, 0x58, 0x16]
 
+subKey1 :: Key
+subKey1 = [0xa0, 0xfa, 0xfe, 0x17, 0x88, 0x54, 0x2c, 0xb1,
+    0x23, 0xa3, 0x39, 0x39, 0x2a, 0x6c, 0x76, 0x05]
+
 byteSubOutput1 :: Block
 byteSubOutput1 = [0x09, 0x08, 0x62, 0xBF, 0x6F, 0x28, 0xE3, 0x04,
     0x2C, 0x74, 0x7F, 0xEE, 0xDA, 0x4A, 0x6A, 0x47]
@@ -29,15 +33,29 @@ shiftRowsOutput1 :: Block
 shiftRowsOutput1 = [0x09, 0x28, 0x7F, 0x47, 0x6F, 0x74, 0x6A, 0xBF,
     0x2C, 0x4A, 0x62, 0x04, 0xDA, 0x08, 0xE3, 0xEE]
 
+mixColumnsOutput1 :: Block
+mixColumnsOutput1 = [0x52, 0x9F, 0x16, 0xC2, 0x97, 0x86, 0x15, 0xCA,
+    0xE0, 0x1A, 0xAE, 0x54, 0xBA, 0x1A, 0x26, 0x59]
+
+keyAddOutput1 :: Block
+keyAddOutput1 = [0xF2, 0x65, 0xE8, 0xD5, 0x1F, 0xD2, 0x39, 0x7B,
+    0xC3, 0xB9, 0x97, 0x6D, 0x90, 0x76, 0x50, 0x5C]
+
 runTests :: IO ()
 runTests = hspec $ do
     describe "Round.Internal Module" $ do
-        describe "keyAdd" $ do
+        describe "InitialKeyAdd" $ do
             it "ensures that the initial keyAdd functions correctly" $ do
                 keyAdd key block1 `shouldBe` initialKeyAddOutput1
-        describe "byteSub" $ do
+        describe "R1ByteSub" $ do
             it "ensures that the byteSub SBox layer functions correctly" $ do
                 byteSub initialKeyAddOutput1 `shouldBe` byteSubOutput1
-        describe "byteSub" $ do
+        describe "R1ShiftRows" $ do
             it "ensures that the shiftRows layer functions correctly" $ do
                 shiftRows byteSubOutput1 `shouldBe` shiftRowsOutput1
+        describe "R1MixColumn" $ do
+            it "ensures that the mixColumns layer functions correctly" $ do
+                mixColumns shiftRowsOutput1 `shouldBe` mixColumnsOutput1
+        describe "R1KeyAdd" $ do
+            it "ensures that the keyAdd layer functions correctly" $ do
+                keyAdd subKey1 mixColumnsOutput1 `shouldBe` keyAddOutput1
