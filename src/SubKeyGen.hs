@@ -12,13 +12,13 @@ import SBox(sBox)
 type KeyWord = [Word8]
 type RC = Word8
 
+generateSubKeys :: Key -> [Key]
+generateSubKeys = undefined
+
 rcVals :: [RC]
 rcVals = map (fromIntegral . modF2m aesPolynomial) (take numRounds $ doubles 1)
     where
         doubles n = n:(doubles $ 2 * n)
-
-generateSubKeys :: Key -> [Key]
-generateSubKeys = undefined
 
 g :: RC -> KeyWord -> KeyWord
 g rc kw = rcXor . map sBox $ kwRot
