@@ -34,12 +34,13 @@ keyGen :: Int -> Key -> State ([RC], [Key]) ()
 keyGen 0 _ = return ()
 keyGen n k = do
     rc <- popRC
-    w0' <- return $ w0 `mapXor` g rc w3
-    w1' <- return $ w0' `mapXor` w1
-    w2' <- return $ w1' `mapXor` w2
-    w3' <- return $ w2' `mapXor` w3
-    pushSubkey . concat $ [w0', w1', w2', w3']
-    keyGen (n-1) . concat $ [w0', w1', w2', w3']
+    let w0' = w0 `mapXor` g rc w3
+    let w1' = w0' `mapXor` w1
+    let w2' = w1' `mapXor` w2
+    let w3' = w2' `mapXor` w3
+    let subKey = concat [w0', w1', w2', w3']
+    pushSubkey subKey
+    keyGen (n-1) subKey
         where
             mapXor = zipWith xor
             [w0, w1, w2, w3] = chunksOf 4 k
