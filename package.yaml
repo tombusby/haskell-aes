@@ -24,6 +24,7 @@ dependencies:
 - split
 - bytestring
 - cryptonite
+- mtl
 
 library:
   source-dirs: src
