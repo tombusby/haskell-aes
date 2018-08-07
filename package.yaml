@@ -1,6 +1,6 @@
 name:                haskell-aes
 version:             0.1.0.0
-github:              "githubuser/haskell-aes"
+github:              "tombusby/haskell-aes"
 license:             BSD3
 author:              "Tom Busby"
 maintainer:          "tom@busby.ninja"
