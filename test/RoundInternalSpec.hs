@@ -69,4 +69,3 @@ runTests = hspec $ do
                 keyAdd subKey1 mixColumnsOutput1 `shouldBe` keyAddOutput1
             it "ensures that the inverse keyAdd layer functions correctly" $
                 keyAdd subKey1 keyAddOutput1 `shouldBe` mixColumnsOutput1
-
