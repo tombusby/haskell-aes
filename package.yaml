@@ -25,6 +25,7 @@ dependencies:
 - bytestring
 - cryptonite
 - mtl
+- directory
 
 library:
   source-dirs: src
