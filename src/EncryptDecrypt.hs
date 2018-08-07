@@ -14,21 +14,35 @@ import Round.Internal (keyAdd, byteSub, byteSubInv, shiftRows, shiftRowsInv)
 encrypt :: Key -> Block -> Block
 encrypt key block = evalState state $ generateSubKeys key
     where
-        state = encryptSateful numRounds $ keyAdd block key 
+        state = encryptStateful numRounds $ keyAdd block key 
 
 decrypt :: Key -> Block -> Block
-decrypt = undefined
+decrypt key block = keyAdd key . evalState state $ reversedSubKeys
+    where
+        state = decryptStateful numRounds block
+        reversedSubKeys = reverse $ generateSubKeys key
 
-popSubKey :: State ([Key]) Key
+popSubKey :: State [Key] Key
 popSubKey = do
     (subKey:ks) <- get
     put ks
     return subKey
 
-encryptSateful :: Int -> Block -> State ([Key]) Block
-encryptSateful 1 block = do
+encryptStateful :: Int -> Block -> State [Key] Block
+encryptStateful 1 block = do
     subKey <- popSubKey
     return $ keyAdd subKey . shiftRows . byteSub $ block
-encryptSateful n block = do
+encryptStateful n block = do
     subKey <- popSubKey
-    encryptSateful (n-1) $ roundEncrypt subKey block
+    encryptStateful (n-1) $ roundEncrypt subKey block
+
+decryptStateful :: Int -> Block -> State [Key] Block
+decryptStateful 0 block = return block
+decryptStateful n block 
+    | n == numRounds = do
+        subKey <- popSubKey
+        let finalRoundInv = byteSubInv . shiftRowsInv . keyAdd subKey
+        decryptStateful (n-1) $ finalRoundInv block
+    | n < numRounds = do
+        subKey <- popSubKey
+        decryptStateful (n-1) $ roundDecrypt subKey block

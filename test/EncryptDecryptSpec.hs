@@ -22,8 +22,17 @@ round10Output = [0x3A, 0xD7, 0x7B, 0xB4, 0x0D, 0x7A, 0x36, 0x60,
     0xA8, 0x9E, 0xCA, 0xF3, 0x24, 0x66, 0xEF, 0x97]
 
 runTests :: IO ()
-runTests = hspec $ do
+runTests = hspec $
     describe "EncryptDecryptSpec Module" $ do
-        describe "encrypt" $ do
+        describe "encrypt" $
             it "ensures that encrypting with a given key produces the expected output" $
                 encrypt key block1 `shouldBe` round10Output
+        describe "decrypt" $ 
+            it "ensures that decrypting with a given key produces the expected output" $
+                decrypt key round10Output `shouldBe` block1
+        describe "encrypt/decrypt" $  
+            it "ensures that encryption and decryption are inverse operations" $ do
+                (decrypt key . encrypt key $ block1) `shouldBe` block1
+                (encrypt key . decrypt key $ block1) `shouldBe` block1
+                (decrypt block1 . encrypt block1 $ key) `shouldBe` key
+                (encrypt block1 . decrypt block1 $ key) `shouldBe` key
