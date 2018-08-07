@@ -31,9 +31,10 @@ subKey10 = [0xD0, 0x14, 0xF9, 0xA8, 0xC9, 0xEE, 0x25, 0x89,
 
 runTests :: IO ()
 runTests = hspec $ do
-    describe "generateSubKeys" $ do
-        it "checks that, given a key, it prodeces the correct list of subkeys" $ do
-            ((!!0) . generateSubKeys $ key) `shouldBe` subKey1
-            ((!!3) . generateSubKeys $ key) `shouldBe` subKey4
-            ((!!8) . generateSubKeys $ key) `shouldBe` subKey9
-            ((!!9) . generateSubKeys $ key) `shouldBe` subKey10
+    describe "SubKeyGen Module" $
+        describe "generateSubKeys" $
+            it "checks that, given a key, it prodeces the correct list of subkeys" $ do
+                ((!!0) . generateSubKeys $ key) `shouldBe` subKey1
+                ((!!3) . generateSubKeys $ key) `shouldBe` subKey4
+                ((!!8) . generateSubKeys $ key) `shouldBe` subKey9
+                ((!!9) . generateSubKeys $ key) `shouldBe` subKey10

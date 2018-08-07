@@ -3,6 +3,7 @@ import PaddingSpec (runTests)
 import RoundInternalSpec (runTests)
 import RoundSpec (runTests)
 import SubKeyGenSpec (runTests)
+import EncryptDecryptSpec (runTests)
 
 main :: IO ()
 main = do
@@ -11,3 +12,4 @@ main = do
     RoundInternalSpec.runTests
     RoundSpec.runTests
     SubKeyGenSpec.runTests
+    EncryptDecryptSpec.runTests
