@@ -1,6 +1,6 @@
 module Padding
-    ( pad
-    , unpad
+    ( pad,
+      unpad,
     ) where
 
 import Globals (Block, blockSize)

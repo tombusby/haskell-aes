@@ -1,6 +1,6 @@
 module SBox
-    ( sBox
-    , sBoxInv
+    ( sBox,
+      sBoxInv,
     ) where
 
 import Data.Word (Word8)

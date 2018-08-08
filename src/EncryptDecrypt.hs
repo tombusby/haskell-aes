@@ -1,6 +1,8 @@
 module EncryptDecrypt
     ( encrypt,
       decrypt,
+      encryptBlocksECB,
+      decryptBlocksECB,
     ) where
 
 import Control.Monad.State.Lazy
@@ -10,6 +12,13 @@ import Globals (Key, Block, numRounds)
 import SubKeyGen (generateSubKeys)
 import Round (roundEncrypt, roundDecrypt)
 import Round.Internal (keyAdd, byteSub, byteSubInv, shiftRows, shiftRowsInv)
+import Padding (pad, unpad)
+
+encryptBlocksECB :: Key -> [Block] -> [Block]
+encryptBlocksECB key = map (encrypt key) . pad
+
+decryptBlocksECB :: Key -> [Block] -> Maybe [Block]
+decryptBlocksECB key = unpad . map (decrypt key)
 
 encrypt :: Key -> Block -> Block
 encrypt key block = evalState state $ generateSubKeys key

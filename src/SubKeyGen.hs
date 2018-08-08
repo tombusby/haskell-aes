@@ -1,5 +1,5 @@
 module SubKeyGen
-    ( generateSubKeys
+    ( generateSubKeys,
     ) where
 
 import Control.Monad.State.Lazy
