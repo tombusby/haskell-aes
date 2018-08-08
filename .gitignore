@@ -72,5 +72,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# Ignore any test files in the repo
+*.txt
 
 # End of https://www.gitignore.io/api/osx,linux,haskell
