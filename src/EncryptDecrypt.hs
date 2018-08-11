@@ -3,6 +3,8 @@ module EncryptDecrypt
       decrypt,
       encryptBlocksECB,
       decryptBlocksECB,
+      encryptBlocksCBC,
+      decryptBlocksCBC,
     ) where
 
 import Control.Monad.State.Lazy
@@ -14,11 +16,39 @@ import Round (roundEncrypt, roundDecrypt)
 import Round.Internal (keyAdd, byteSub, byteSubInv, shiftRows, shiftRowsInv)
 import Padding (pad, unpad)
 
+type IV = Block
+
 encryptBlocksECB :: Key -> [Block] -> [Block]
 encryptBlocksECB key = map (encrypt key) . pad
 
 decryptBlocksECB :: Key -> [Block] -> Maybe [Block]
 decryptBlocksECB key = unpad . map (decrypt key)
+
+encryptBlocksCBC :: Key -> IV -> [Block] -> [Block]
+encryptBlocksCBC key iv = encryptBlocksCBC' key iv . pad
+
+encryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
+encryptBlocksCBC' _ _ [] = []
+encryptBlocksCBC' key iv (b:bs) = c1 : encryptCBCAccumulate c1 bs
+    where
+        cbcEncrypt addVal = encrypt key . keyAdd addVal
+        c1 = cbcEncrypt iv b
+        encryptCBCAccumulate _ [] = []
+        encryptCBCAccumulate c (b:bs) = let cNext = cbcEncrypt c b in
+            cNext : encryptCBCAccumulate cNext bs
+
+decryptBlocksCBC :: Key -> IV -> [Block] -> Maybe [Block]
+decryptBlocksCBC key iv = unpad . decryptBlocksCBC' key iv
+
+decryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
+decryptBlocksCBC' _ _ [] = []
+decryptBlocksCBC' key iv (b:bs) = p1 : decryptCBCAccumulate b bs
+    where
+        cbcDecrypt addVal = keyAdd addVal . decrypt key
+        p1 = cbcDecrypt iv b
+        decryptCBCAccumulate _ [] = []
+        decryptCBCAccumulate c (b:bs) = let pNext = cbcDecrypt c b in
+            pNext : decryptCBCAccumulate b bs
 
 encrypt :: Key -> Block -> Block
 encrypt key block = evalState state $ generateSubKeys key

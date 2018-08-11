@@ -7,7 +7,7 @@ import Test.QuickCheck
 import Control.Exception (evaluate)
 
 import Globals (Key, Block)
-import EncryptDecrypt (encrypt, decrypt)
+import EncryptDecrypt (encrypt, decrypt, encryptBlocksCBC, decryptBlocksCBC)
 
 block1 :: Block
 block1 = [0x6B, 0xC1, 0xBE, 0xE2, 0x2E, 0x40, 0x9F, 0x96,
@@ -24,15 +24,25 @@ round10Output = [0x3A, 0xD7, 0x7B, 0xB4, 0x0D, 0x7A, 0x36, 0x60,
 runTests :: IO ()
 runTests = hspec $
     describe "EncryptDecryptSpec Module" $ do
-        describe "encrypt" $
-            it "ensures that encrypting with a given key produces the expected output" $
-                encrypt key block1 `shouldBe` round10Output
-        describe "decrypt" $ 
-            it "ensures that decrypting with a given key produces the expected output" $
-                decrypt key round10Output `shouldBe` block1
-        describe "encrypt/decrypt" $  
-            it "ensures that encryption and decryption are inverse operations" $ do
-                (decrypt key . encrypt key $ block1) `shouldBe` block1
-                (encrypt key . decrypt key $ block1) `shouldBe` block1
-                (decrypt block1 . encrypt block1 $ key) `shouldBe` key
-                (encrypt block1 . decrypt block1 $ key) `shouldBe` key
+        describe "encrypt/decrypt primitives" $ do
+            describe "encrypt" $
+                it "ensures that encrypting with a given key produces the expected output" $
+                    encrypt key block1 `shouldBe` round10Output
+            describe "decrypt" $ 
+                it "ensures that decrypting with a given key produces the expected output" $
+                    decrypt key round10Output `shouldBe` block1
+            describe "encrypt/decrypt" $  
+                it "ensures that encryption and decryption are inverse operations" $ do
+                    (decrypt key . encrypt key $ block1) `shouldBe` block1
+                    (encrypt key . decrypt key $ block1) `shouldBe` block1
+                    (decrypt block1 . encrypt block1 $ key) `shouldBe` key
+                    (encrypt block1 . decrypt block1 $ key) `shouldBe` key
+        describe "CBC mode" $
+            it "ensures that CBC encryption and CBC decryption are (not including Maybe) inverse operations" $ do
+                let iv = round10Output
+                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1]) `shouldBe` Just [block1]
+                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key]) `shouldBe` Just [key]
+                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, iv]) `shouldBe` Just [block1, iv]
+                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [iv, key]) `shouldBe` Just [iv, key]
+                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, [0, 1]]) `shouldBe` Just [block1, [0, 1]]
+                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key, [0, 1]]) `shouldBe` Just [key, [0, 1]]
