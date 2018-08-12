@@ -5,6 +5,7 @@ module EncryptDecryptSpec
 import Test.Hspec
 import Test.QuickCheck
 import Control.Exception (evaluate)
+import Data.Maybe (fromJust)
 
 import Globals (Key, Block)
 import EncryptDecrypt (encrypt, decrypt, encryptBlocksCBC, decryptBlocksCBC)
@@ -33,18 +34,20 @@ runTests = hspec $
                     decrypt key round10Output `shouldBe` block1
             describe "encrypt/decrypt" $  
                 it "ensures that encryption and decryption are inverse operations" $ do
-                    (decrypt key . encrypt key $ block1) `shouldBe` block1
-                    (encrypt key . decrypt key $ block1) `shouldBe` block1
-                    (decrypt block1 . encrypt block1 $ key) `shouldBe` key
-                    (encrypt block1 . decrypt block1 $ key) `shouldBe` key
+                    (decrypt key . encrypt key) block1 `shouldBe` block1
+                    (encrypt key . decrypt key) block1 `shouldBe` block1
+                    (decrypt block1 . encrypt block1) key `shouldBe` key
+                    (encrypt block1 . decrypt block1) key `shouldBe` key
         describe "CBC mode" $
             it "ensures that CBC encryption and CBC decryption are (not including Maybe) inverse operations" $ do
                 let iv = round10Output
                 -- All blocks are a multiple of blockSize (so have full padding block as final block)
-                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1]) `shouldBe` Just [block1]
-                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key]) `shouldBe` Just [key]
-                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, iv]) `shouldBe` Just [block1, iv]
-                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [iv, key]) `shouldBe` Just [iv, key]
+                encryptDecryptCBC key iv [block1] `shouldBe` [block1]
+                encryptDecryptCBC iv block1 [key] `shouldBe` [key]
+                encryptDecryptCBC key iv [block1, iv] `shouldBe` [block1, iv]
+                encryptDecryptCBC iv block1 [iv, key] `shouldBe` [iv, key]
                 -- Final block is not a multiple of blockSize (final block is padded and unpadded)
-                (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, [0, 1]]) `shouldBe` Just [block1, [0, 1]]
-                (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key, [0, 1]]) `shouldBe` Just [key, [0, 1]]
+                encryptDecryptCBC key iv [block1, [0, 1]] `shouldBe` [block1, [0, 1]]
+                encryptDecryptCBC iv block1 [key, [0, 1]] `shouldBe` [key, [0, 1]]
+    where
+        encryptDecryptCBC key iv = fromJust . decryptBlocksCBC key iv . encryptBlocksCBC key iv
