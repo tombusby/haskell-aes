@@ -17,20 +17,21 @@ type RC = Word8
 generateSubKeys :: Key -> [Key]
 generateSubKeys k = reverse keys
     where
-        keys = snd . execState (keyGen numRounds k) $ (rcVals, [])
+        keys = snd . execState (keyGen numRounds k) $ (1, [])
 
-pushSubkey :: Key -> State ([RC], [Key]) ()
+pushSubkey :: Key -> State (RC, [Key]) ()
 pushSubkey k = do
     (rcs, sks) <- get
     put (rcs, k:sks)
 
-popRC :: State ([RC], [Key]) RC
+popRC :: State (RC, [Key]) RC
 popRC = do
-    (rc:rcs, sks) <- get
-    put (rcs, sks)
+    (rc, sks) <- get
+    let newRC = fromIntegral . modF2m aesPolynomial . (2*) . fromIntegral $ rc
+    put (newRC, sks)
     return rc
 
-keyGen :: Int -> Key -> State ([RC], [Key]) ()
+keyGen :: Int -> Key -> State (RC, [Key]) ()
 keyGen 0 _ = return ()
 keyGen n k = do
     rc <- popRC
@@ -44,11 +45,6 @@ keyGen n k = do
         where
             mapXor = zipWith xor
             [w0, w1, w2, w3] = chunksOf 4 k
-
-rcVals :: [RC]
-rcVals = map (fromIntegral . modF2m aesPolynomial) (take numRounds $ doubles 1)
-    where
-        doubles n = n:(doubles $ 2 * n)
 
 g :: RC -> KeyWord -> KeyWord
 g rc kw = rcXor . map sBox $ kwRot
