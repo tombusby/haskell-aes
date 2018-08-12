@@ -31,7 +31,7 @@ encryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
 encryptBlocksCBC' _ _ [] = []
 encryptBlocksCBC' key iv (b:bs) = c1 : encryptCBCAccumulate c1 bs
     where
-        cbcEncrypt addVal = encrypt key . keyAdd addVal
+        cbcEncrypt addVal = encrypt key . zipWith xor addVal
         c1 = cbcEncrypt iv b
         encryptCBCAccumulate _ [] = []
         encryptCBCAccumulate c (b:bs) = let cNext = cbcEncrypt c b in
@@ -44,7 +44,7 @@ decryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
 decryptBlocksCBC' _ _ [] = []
 decryptBlocksCBC' key iv (b:bs) = p1 : decryptCBCAccumulate b bs
     where
-        cbcDecrypt addVal = keyAdd addVal . decrypt key
+        cbcDecrypt addVal = zipWith xor addVal . decrypt key
         p1 = cbcDecrypt iv b
         decryptCBCAccumulate _ [] = []
         decryptCBCAccumulate c (b:bs) = let pNext = cbcDecrypt c b in
