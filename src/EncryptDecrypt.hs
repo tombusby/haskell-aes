@@ -12,8 +12,8 @@ import Data.Bits (xor)
 
 import Globals (Key, Block, numRounds)
 import SubKeyGen (generateSubKeys)
-import Round (roundEncrypt, roundDecrypt)
-import Round.Internal (keyAdd, byteSub, byteSubInv, shiftRows, shiftRowsInv)
+import Round (roundEncrypt, roundDecrypt, finalRoundEncrypt, finalRoundDecrypt)
+import Round.Internal (keyAdd)
 import Padding (pad, unpad)
 
 type IV = Block
@@ -65,7 +65,7 @@ popSubKey = do
 encryptStateful :: Int -> Block -> State [Key] Block
 encryptStateful 1 block = do
     subKey <- popSubKey
-    return $ keyAdd subKey . shiftRows . byteSub $ block
+    return $ finalRoundEncrypt subKey block
 encryptStateful n block = do
     subKey <- popSubKey
     encryptStateful (n-1) $ roundEncrypt subKey block
@@ -75,8 +75,7 @@ decryptStateful 0 block = return block
 decryptStateful n block 
     | n == numRounds = do
         subKey <- popSubKey
-        let finalRoundInv = byteSubInv . shiftRowsInv . keyAdd subKey
-        decryptStateful (n-1) $ finalRoundInv block
+        decryptStateful (n-1) $ finalRoundDecrypt subKey block
     | n < numRounds = do
         subKey <- popSubKey
         decryptStateful (n-1) $ roundDecrypt subKey block

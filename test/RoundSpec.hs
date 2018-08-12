@@ -25,11 +25,13 @@ runTests :: IO ()
 runTests = hspec $ do
     describe "Round Module" $ do
         describe "roundEncrypt" $
-            it "ensures that roundEncrypt produces correct output" $
+            it "ensures that roundEncrypt produces correct output" $ do
                 roundEncrypt subKey1 initialKeyAddOutput1 `shouldBe` roundOutput1
+                pendingWith "need to add tests for finalRoundEncrypt"
         describe "roundDecrypt" $
-            it "ensures that roundDecrypt produces correct output" $
+            it "ensures that roundDecrypt produces correct output" $ do
                 roundDecrypt subKey1 roundOutput1 `shouldBe` initialKeyAddOutput1
+                pendingWith "need to add tests for finalRoundDecrypt"
         describe "check inverse holds" $
             it "checks that round encryption and decryption are inverses of each other" $ do
                 encryptDecrypt initialKeyAddOutput1 `shouldBe` initialKeyAddOutput1
