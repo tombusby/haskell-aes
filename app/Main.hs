@@ -28,8 +28,7 @@ doOperation "decrypt" input output key = do
     putStrLn "Reading input..."
     ciphertextBlocks <- chunksOf blockSize . B.unpack <$> B.readFile input
     putStrLn "Decryping input..."
-    plaintextBlocks <- return . decryptBlocksECB key $ ciphertextBlocks
-    case plaintextBlocks of
+    case decryptBlocksECB key ciphertextBlocks of
         Just blocks -> do
             putStrLn "Writing to output file..."
             B.writeFile output . B.pack . concat $ blocks
