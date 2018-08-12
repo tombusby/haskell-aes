@@ -25,12 +25,10 @@ decryptBlocksECB :: Key -> [Block] -> Maybe [Block]
 decryptBlocksECB key = unpad . map (decrypt key)
 
 encryptBlocksCBC :: Key -> IV -> [Block] -> [Block]
-encryptBlocksCBC key iv = encryptBlocksCBC' key iv . pad
-
-encryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
-encryptBlocksCBC' _ _ [] = []
-encryptBlocksCBC' key iv (b:bs) = c1 : encryptCBCAccumulate c1 bs
+encryptBlocksCBC _ _ [] = []
+encryptBlocksCBC key iv bs = c1 : encryptCBCAccumulate c1 bs'
     where
+        (b:bs') = pad bs
         cbcEncrypt addVal = encrypt key . zipWith xor addVal
         c1 = cbcEncrypt iv b
         encryptCBCAccumulate _ [] = []
@@ -38,11 +36,8 @@ encryptBlocksCBC' key iv (b:bs) = c1 : encryptCBCAccumulate c1 bs
             cNext : encryptCBCAccumulate cNext bs
 
 decryptBlocksCBC :: Key -> IV -> [Block] -> Maybe [Block]
-decryptBlocksCBC key iv = unpad . decryptBlocksCBC' key iv
-
-decryptBlocksCBC' :: Key -> IV -> [Block] -> [Block]
-decryptBlocksCBC' _ _ [] = []
-decryptBlocksCBC' key iv (b:bs) = p1 : decryptCBCAccumulate b bs
+decryptBlocksCBC _ _ [] = Nothing
+decryptBlocksCBC key iv (b:bs) = unpad $ p1 : decryptCBCAccumulate b bs
     where
         cbcDecrypt addVal = zipWith xor addVal . decrypt key
         p1 = cbcDecrypt iv b
