@@ -40,9 +40,11 @@ runTests = hspec $
         describe "CBC mode" $
             it "ensures that CBC encryption and CBC decryption are (not including Maybe) inverse operations" $ do
                 let iv = round10Output
+                -- All blocks are a multiple of blockSize (so have full padding block as final block)
                 (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1]) `shouldBe` Just [block1]
                 (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key]) `shouldBe` Just [key]
                 (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, iv]) `shouldBe` Just [block1, iv]
                 (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [iv, key]) `shouldBe` Just [iv, key]
+                -- Final block is not a multiple of blockSize (final block is padded and unpadded)
                 (decryptBlocksCBC key iv . encryptBlocksCBC key iv $ [block1, [0, 1]]) `shouldBe` Just [block1, [0, 1]]
                 (decryptBlocksCBC iv block1 . encryptBlocksCBC iv block1 $ [key, [0, 1]]) `shouldBe` Just [key, [0, 1]]
