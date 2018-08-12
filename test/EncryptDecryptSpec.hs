@@ -8,7 +8,7 @@ import Control.Exception (evaluate)
 import Data.Maybe (fromJust)
 
 import Globals (Key, Block)
-import EncryptDecrypt (encrypt, decrypt, encryptBlocksCBC, decryptBlocksCBC)
+import EncryptDecrypt
 
 block1 :: Block
 block1 = [0x6B, 0xC1, 0xBE, 0xE2, 0x2E, 0x40, 0x9F, 0x96,
@@ -38,6 +38,16 @@ runTests = hspec $
                     (encrypt key . decrypt key) block1 `shouldBe` block1
                     (decrypt block1 . encrypt block1) key `shouldBe` key
                     (encrypt block1 . decrypt block1) key `shouldBe` key
+        describe "ECB mode" $
+            it "ensures that ECB encryption and ECB decryption are (not including Maybe) inverse operations" $ do
+                -- All blocks are a multiple of blockSize (so have full padding block as final block)
+                encryptDecryptECB key [block1] `shouldBe` [block1]
+                encryptDecryptECB block1 [key] `shouldBe` [key]
+                encryptDecryptECB key [block1, key] `shouldBe` [block1, key]
+                encryptDecryptECB block1 [key, key] `shouldBe` [key, key]
+                -- Final block is not a multiple of blockSize (final block is padded and unpadded)
+                encryptDecryptECB key [block1, [0, 1]] `shouldBe` [block1, [0, 1]]
+                encryptDecryptECB block1 [key, [0, 1]] `shouldBe` [key, [0, 1]]
         describe "CBC mode" $
             it "ensures that CBC encryption and CBC decryption are (not including Maybe) inverse operations" $ do
                 let iv = round10Output
@@ -50,4 +60,5 @@ runTests = hspec $
                 encryptDecryptCBC key iv [block1, [0, 1]] `shouldBe` [block1, [0, 1]]
                 encryptDecryptCBC iv block1 [key, [0, 1]] `shouldBe` [key, [0, 1]]
     where
+        encryptDecryptECB key = fromJust . decryptBlocksECB key . encryptBlocksECB key
         encryptDecryptCBC key iv = fromJust . decryptBlocksCBC key iv . encryptBlocksCBC key iv
