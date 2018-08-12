@@ -21,7 +21,7 @@ doOperation "encrypt" input output key = do
     putStrLn "Reading input..."
     plaintextBlocks <- chunksOf blockSize . B.unpack <$> B.readFile input
     putStrLn "Encryping input..."
-    ciphertextBlocks <- return . encryptBlocksECB key $ plaintextBlocks
+    let ciphertextBlocks = encryptBlocksECB key plaintextBlocks
     putStrLn "Writing to output file..."
     B.writeFile output . B.pack . concat $ ciphertextBlocks
 doOperation "decrypt" input output key = do
