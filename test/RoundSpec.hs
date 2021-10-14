@@ -5,9 +5,9 @@ where
 
 import Control.Exception (evaluate)
 import Globals (Block, Key)
-import Round
-import Test.Hspec
-import Test.QuickCheck
+import Round (roundDecrypt, roundEncrypt)
+import Test.Hspec (describe, hspec, it, pendingWith, shouldBe)
+import Test.QuickCheck ()
 
 initialKeyAddOutput1 :: Block
 initialKeyAddOutput1 =

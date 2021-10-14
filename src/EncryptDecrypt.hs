@@ -11,6 +11,10 @@ module EncryptDecrypt
 where
 
 import Control.Monad.State.Lazy
+  ( MonadState (get, put),
+    State,
+    evalState,
+  )
 import Data.Bits (xor)
 import Globals (Block, Key, numRounds)
 import Padding (pad, unpad)

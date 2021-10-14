@@ -4,10 +4,14 @@ module SubKeyGen
 where
 
 import Control.Monad.State.Lazy
+  ( MonadState (get, put),
+    State,
+    execState,
+  )
 import Crypto.Number.F2m (modF2m)
 import Data.Bits (xor)
 import Data.List.Split (chunksOf)
-import Data.Word
+import Data.Word (Word8)
 import Globals (Key, aesPolynomial, numRounds)
 import SBox (sBox)
 

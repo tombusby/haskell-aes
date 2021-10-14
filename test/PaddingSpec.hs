@@ -5,9 +5,16 @@ where
 
 import Control.Exception (evaluate)
 import Globals (Block, blockSize)
-import Padding
+import Padding (pad, unpad)
 import Test.Hspec
-import Test.QuickCheck
+  ( describe,
+    hspec,
+    it,
+    shouldBe,
+    shouldNotBe,
+    shouldSatisfy,
+  )
+import Test.QuickCheck (Testable (property))
 
 needsPadding :: [Block]
 needsPadding = [[0x6B, 0xC1, 0xBE, 0xE2, 0x2E, 0x40, 0x9F, 0x96]]

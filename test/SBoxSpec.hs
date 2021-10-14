@@ -4,9 +4,9 @@ module SBoxSpec
 where
 
 import Control.Exception (evaluate)
-import SBox
-import Test.Hspec
-import Test.QuickCheck
+import SBox (sBox, sBoxInv)
+import Test.Hspec (describe, hspec, it, shouldBe)
+import Test.QuickCheck (Testable (property))
 
 runTests :: IO ()
 runTests = hspec $

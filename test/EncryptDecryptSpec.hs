@@ -6,9 +6,15 @@ where
 import Control.Exception (evaluate)
 import Data.Maybe (fromJust)
 import EncryptDecrypt
+  ( decrypt,
+    decryptBlocksCBC,
+    decryptBlocksECB,
+    encrypt,
+    encryptBlocksCBC,
+    encryptBlocksECB,
+  )
 import Globals (Block, Key)
-import Test.Hspec
-import Test.QuickCheck
+import Test.Hspec (describe, hspec, it, shouldBe)
 
 block1 :: Block
 block1 =

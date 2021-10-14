@@ -5,9 +5,9 @@ where
 
 import Control.Exception (evaluate)
 import Globals (Key)
-import SubKeyGen
-import Test.Hspec
-import Test.QuickCheck
+import SubKeyGen (generateSubKeys)
+import Test.Hspec (describe, hspec, it, shouldBe)
+import Test.QuickCheck ()
 
 key :: Key
 key =

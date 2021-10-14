@@ -6,8 +6,15 @@ where
 import Control.Exception (evaluate)
 import Globals (Block, Key)
 import Round.Internal
-import Test.Hspec
-import Test.QuickCheck
+  ( byteSub,
+    byteSubInv,
+    keyAdd,
+    mixColumns,
+    mixColumnsInv,
+    shiftRows,
+    shiftRowsInv,
+  )
+import Test.Hspec (describe, hspec, it, shouldBe)
 
 block1 :: Block
 block1 =

@@ -1,6 +1,6 @@
 module Globals where
 
-import Data.Word
+import Data.Word (Word8)
 
 type Block = [Word8]
 
