@@ -3,7 +3,9 @@ module Globals where
 import Data.Word
 
 type Block = [Word8]
+
 type Key = [Word8]
+
 type KeyWord = [Word8]
 
 blockSize :: Num a => a

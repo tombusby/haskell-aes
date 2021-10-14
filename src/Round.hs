@@ -1,13 +1,21 @@
 module Round
-    ( roundEncrypt,
-      finalRoundEncrypt,
-      roundDecrypt,
-      finalRoundDecrypt,
-    ) where
+  ( roundEncrypt,
+    finalRoundEncrypt,
+    roundDecrypt,
+    finalRoundDecrypt,
+  )
+where
 
-import Globals (Key, Block)
-import Round.Internal (keyAdd, byteSub, shiftRows, mixColumns,
-        byteSubInv, shiftRowsInv, mixColumnsInv)
+import Globals (Block, Key)
+import Round.Internal
+  ( byteSub,
+    byteSubInv,
+    keyAdd,
+    mixColumns,
+    mixColumnsInv,
+    shiftRows,
+    shiftRowsInv,
+  )
 
 roundEncrypt :: Key -> Block -> Block
 roundEncrypt k = keyAdd k . mixColumns . shiftRows . byteSub
